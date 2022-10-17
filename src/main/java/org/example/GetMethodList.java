@@ -12,7 +12,7 @@ import java.util.*;
 
 public class GetMethodList {
     public static Set<String> s = new HashSet<>();
-    public static final String APP_PACKAGE_NAME = "com/ichi2/anki";
+    public static final String APP_PACKAGE_NAME = "com/amaze/filemanager";
     public static final String NOT_HANDLER_METHOD = "onCreate|onStart|onResume|onPause|onStop|onDestroy|onSaveInstanceState|onPreExecute|onPostExecute|onLoadFinished|onBindViewHolder|onAttachedToWindow|onProgressUpdate|onActivityResult";
 
     public static void readTxt(String filePath) {
@@ -122,7 +122,7 @@ public class GetMethodList {
     }
 
     public static void main(String[] args) {
-        String filePath = "D:\\instruction-study\\Driod-store\\Anki-Android-bug-4451\\coverage.txt";
+        String filePath = "coverage.txt";
         readTxt(filePath);
     }
 }
