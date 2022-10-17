@@ -1,5 +1,5 @@
 package org.example;
-
+//先在as里把bug复现，然后把coverage.txt放到这里做比较，生成全插桩版本的MethodList.txt，然后再把这个txt放到as里重新build一遍变成部分插桩的版本，再去跑一个coverage.txt
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -59,14 +59,25 @@ public class GetMethodList {
                             }
                             else {
                                 tag = false;
-                                JSONObject object = new JSONObject(new LinkedHashMap<>());
-                                object.put("ID" , count);
-                                object.put("type", head);
-                                object.put("signature", methodChain);
-                                array.add(object);
-//                                objectAll.put("event" + count, object);
+                                // flag：whether need to write the event signature into the file, avoiding duplication
+                                boolean flag = false;
+                                for(int i = 0; i < array.size(); i++){
+                                    JSONObject ob = array.getJSONObject(i);
+                                    if(head.equals((String)ob.get("type")) && methodChain.equals((List<String>)ob.get("signature"))) {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if(!flag){
+                                    JSONObject object = new JSONObject(new LinkedHashMap<>());
+                                    object.put("ID" , count);
+                                    object.put("type", head);
+                                    object.put("signature", methodChain);
+                                    array.add(object);
+    //                                objectAll.put("event" + count, object);
+                                    count++;
+                                }
                                 head = "";
-                                count++;
                             }
                         }
                     }
@@ -79,7 +90,7 @@ public class GetMethodList {
                         System.out.println(e);
                     }
 //                    System.out.println(object);
-                    JSONObject object2 = new JSONObject(new LinkedHashMap<>());
+                    JSONObject object2 = new JSONObject(new LinkedHashMap<>());  
                     object2.put("event", array);
                     OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("event_signature.json"),"UTF-8");
 //                    osw.write(objectAll.toString());
@@ -100,7 +111,9 @@ public class GetMethodList {
     }
 
     public static void main(String[] args) {
-        String filePath = "coverage.txt";
+        System.out.println("getStart");
+        String filePath = "D:\\instruction-study\\Driod-store\\Anki-Android-bug-4200\\coverage.txt";
+        //String filePath = "C:\\Users\\Melrose\\Desktop\\coverage.txt";
         readTxt(filePath);
     }
 }
