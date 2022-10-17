@@ -1,5 +1,5 @@
 package org.example;
-//先在as里把bug复现，然后把coverage.txt放到这里做比较，生成全插桩版本的MethodList.txt，然后再把这个txt放到as里重新build一遍变成部分插桩的版本，再去跑一个coverage.txt
+
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -39,16 +39,27 @@ public class GetMethodList {
 //                        if(methodName.matches(NOT_HANDLER_METHOD)){
 //                            continue;
 //                        }
-                        if (!tag && (methodName.startsWith("on") || methodName.equals("afterTextChanged") || methodName.equals("verseLongPress"))){
+                        String special = "com/ichi2/anki/NavigationDrawerActivity\\$4/run|com/amaze/filemanager/ui/views/appbar/SearchView/lambda\\$new\\$2";
+                        if (!tag){
 //                            String sql = "select * from event_handler_method where name='" + methodName + "' and name not like '%on%Create%'";
-                            String sql = "select * from themis_method where name='" + methodName + "'";
-                            ResultSet rs = stmt.executeQuery(sql);
-                            if (line.startsWith(APP_PACKAGE_NAME) && rs.next()) {
+                            if(methodName.startsWith("on") || methodName.equals("afterTextChanged") || methodName.equals("verseLongPress")){
+                                String sql = "select * from themis_method where name='" + methodName + "'";
+                                ResultSet rs = stmt.executeQuery(sql);
+
+                                if (line.startsWith(APP_PACKAGE_NAME) && rs.next()) {
+                                    tag = true;
+                                    head = line;
+                                    System.out.println("Now instrumenting：" + line);
+                                    methodChain = new LinkedList<>();
+                                }
+                            }
+                            else if(line.matches(special)){
                                 tag = true;
                                 head = line;
                                 System.out.println("Now instrumenting：" + line);
                                 methodChain = new LinkedList<>();
                             }
+
                         }
                         if (tag) {
                             methodChain.add(line);
@@ -90,7 +101,7 @@ public class GetMethodList {
                         System.out.println(e);
                     }
 //                    System.out.println(object);
-                    JSONObject object2 = new JSONObject(new LinkedHashMap<>());  
+                    JSONObject object2 = new JSONObject(new LinkedHashMap<>());
                     object2.put("event", array);
                     OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("event_signature.json"),"UTF-8");
 //                    osw.write(objectAll.toString());
@@ -111,9 +122,7 @@ public class GetMethodList {
     }
 
     public static void main(String[] args) {
-        System.out.println("getStart");
-        String filePath = "D:\\instruction-study\\Driod-store\\Anki-Android-bug-4200\\coverage.txt";
-        //String filePath = "C:\\Users\\Melrose\\Desktop\\coverage.txt";
+        String filePath = "D:\\instruction-study\\Driod-store\\Anki-Android-bug-4451\\coverage.txt";
         readTxt(filePath);
     }
 }
